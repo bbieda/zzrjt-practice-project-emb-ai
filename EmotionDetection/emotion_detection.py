@@ -20,20 +20,27 @@ def emotion_detector(text_to_analyze):
     # Make the POST request to the service
     response = requests.post(url, json=input_json, headers=headers)
     
-    # Convert the response text into a dictionary using the json library
-    formatted_response = json.loads(response.text)
+    # Check the status code for a blank entry / bad request
+    if response.status_code == 400:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
     
-    # Extract the emotion predictions block from the Watson response structure
+    # Proceed normally if the status code is 200 (Success)
+    formatted_response = json.loads(response.text)
     emotion_predictions = formatted_response['emotionPredictions'][0]['emotion']
     
-    # Extract the required set of emotions and their scores
     anger_score = emotion_predictions['anger']
     disgust_score = emotion_predictions['disgust']
     fear_score = emotion_predictions['fear']
     joy_score = emotion_predictions['joy']
     sadness_score = emotion_predictions['sadness']
     
-    # Isolate the targeted emotions into a dictionary to easily find the dominant one
     emotions_dict = {
         'anger': anger_score,
         'disgust': disgust_score,
@@ -42,11 +49,7 @@ def emotion_detector(text_to_analyze):
         'sadness': sadness_score
     }
     
-    # Logic to find the dominant emotion (the key with the maximum value)
     dominant_emotion = max(emotions_dict, key=emotions_dict.get)
-    
-    # Append the dominant emotion to the final output structure
     emotions_dict['dominant_emotion'] = dominant_emotion
     
-    # Return the formatted dictionary
     return emotions_dict

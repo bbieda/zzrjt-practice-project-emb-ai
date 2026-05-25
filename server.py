@@ -31,6 +31,9 @@ def emotion_detector_route():
     joy = response['joy']
     sadness = response['sadness']
     dominant_emotion = response['dominant_emotion']
+
+    if dominant_emotion is None:
+        return "Invalid text! Please try again."
     
     # Format the output string exactly matching the customer's requirement
     formatted_response = (
