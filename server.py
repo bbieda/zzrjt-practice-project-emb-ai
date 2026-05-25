@@ -1,30 +1,47 @@
+from flask import Flask, render_template, request
 from EmotionDetection import emotion_detector
 
-''' Executing this function initiates the application of sentiment
-    analysis to be executed over the Flask channel and deployed on
-    localhost:5000.
-'''
-# Import Flask, render_template, request from the flask pramework package : TODO
-# Import the sentiment_analyzer function from the package created: TODO
-
-#Initiate the flask app : TODO
-
-@app.route("/sentimentAnalyzer")
-def sent_analyzer():
-    ''' This code receives the text from the HTML interface and 
-        runs sentiment analysis over it using sentiment_analysis()
-        function. The output returned shows the label and its confidence 
-        score for the provided text.
-    '''
-    # TODO
+# Initialize the Flask application
+app = Flask(__name__)
 
 @app.route("/")
 def render_index_page():
-    ''' This function initiates the rendering of the main application
-        page over the Flask channel
-    '''
-    #TODO
+    """
+    Renders the main application page using the index.html template.
+    """
+    return render_template('index.html')
+
+# CHANGE THIS LINE FROM /emotionDetector TO /sentimentAnalyzer
+@app.route("/sentimentAnalyzer")
+def emotion_detector_route():
+    """
+    Processes the text submitted by the user, runs emotion detection,
+    and returns a formatted string response to the frontend.
+    """
+    # Retrieve the text to analyze from the request arguments
+    text_to_analyze = request.args.get('textToAnalyze')
+    
+    # Run emotion detection using the packaged function
+    response = emotion_detector(text_to_analyze)
+    
+    # Extract the individual scores and dominant emotion
+    anger = response['anger']
+    disgust = response['disgust']
+    fear = response['fear']
+    joy = response['joy']
+    sadness = response['sadness']
+    dominant_emotion = response['dominant_emotion']
+    
+    # Format the output string exactly matching the customer's requirement
+    formatted_response = (
+        f"For the given statement, the system response is "
+        f"'anger': {anger}, 'disgust': {disgust}, 'fear': {fear}, "
+        f"'joy': {joy} and 'sadness': {sadness}. "
+        f"The dominant emotion is {dominant_emotion}."
+    )
+    
+    return formatted_response
 
 if __name__ == "__main__":
-    ''' This functions executes the flask app and deploys it on localhost:5000
-    '''#TODO
+    # Deploy the application on localhost:5000
+    app.run(host="0.0.0.0", port=5000)
